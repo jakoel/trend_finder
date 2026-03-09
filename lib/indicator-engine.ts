@@ -206,6 +206,9 @@ export function runIndicatorEngine(
       volume: volSurge ? "SURGE" : aboveAvg ? "ABOVE AVG" : lowVol ? "LOW" : "AVERAGE",
       volumeColor: volSurge ? C.confirmedBuy : aboveAvg ? "#d1d4dc" : lowVol ? "#F44336" : C.neutral,
       volumeRatio: vRatio,
+      lastPrice: closes[li],
+      ema200: !isNaN(e200) ? e200 : null,
+      atrStopColor: atrStopOut[atrStopOut.length - 1]?.color ?? null,
     };
   }
 

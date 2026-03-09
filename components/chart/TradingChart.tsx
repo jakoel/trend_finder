@@ -5,7 +5,7 @@ import { useLightweightChart } from "@/hooks/useLightweightChart";
 import { getAllBars, getLatestBarTime, upsertBars } from "@/lib/db";
 import { fetchOHLCV, fetchOHLCVBefore } from "@/lib/api";
 import { runIndicatorEngine } from "@/lib/indicator-engine";
-import type { Timeframe, MarketMeta, IndicatorSettings, IndicatorStats, OHLCVBar } from "@/types";
+import type { Timeframe, MarketMeta, IndicatorSettings, IndicatorStats, ChartMarker, OHLCVBar } from "@/types";
 
 // 1D → fetch 1W as HTF, 1W → 1M, 1M → no HTF
 const HTF_MAP: Partial<Record<Timeframe, Timeframe>> = {
@@ -20,13 +20,17 @@ interface Props {
   onLoadingChange?: (loading: boolean) => void;
   onMetaUpdate?: (meta: MarketMeta | null) => void;
   onStatsChange?: (stats: IndicatorStats | null) => void;
+  onMarkersChange?: (markers: ChartMarker[]) => void;
+  onBarsChange?: (bars: OHLCVBar[]) => void;
 }
 
-export function TradingChart({ symbol, timeframe, settings, onLoadingChange, onMetaUpdate, onStatsChange }: Props) {
+export function TradingChart({ symbol, timeframe, settings, onLoadingChange, onMetaUpdate, onStatsChange, onMarkersChange, onBarsChange }: Props) {
   const containerRef = useRef<HTMLDivElement>(null);
   const [error, setError] = useState<string | null>(null);
   const statsChangeCbRef = useRef(onStatsChange);
   statsChangeCbRef.current = onStatsChange;
+  const markersChangeCbRef = useRef(onMarkersChange);
+  markersChangeCbRef.current = onMarkersChange;
 
   // Persisted across back-fill calls within the same symbol+timeframe session
   const allBarsRef = useRef<OHLCVBar[]>([]);
@@ -144,6 +148,13 @@ export function TradingChart({ symbol, timeframe, settings, onLoadingChange, onM
         setATRStop(output.atrStop);
         setMarkers(output.markers);
         statsChangeCbRef.current?.(output.stats);
+        // Pass full signal set + bars to Ollama regardless of display settings
+        const fullOutput = runIndicatorEngine(bars, htfBars, {
+          showSignals: true, showATRStop: true, showDivergence: true,
+          showMomentum: true, useADXFilter: settings.useADXFilter,
+        });
+        markersChangeCbRef.current?.(fullOutput.markers);
+        onBarsChange?.(bars);
 
       } catch (err) {
         if (!cancelled) setError(err instanceof Error ? err.message : "Failed to load data");

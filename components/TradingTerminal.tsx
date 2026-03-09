@@ -3,8 +3,9 @@
 import { useState, useEffect, useCallback } from "react";
 import { TopNav } from "./navbar/TopNav";
 import { TradingChart } from "./chart/TradingChart";
+import { OllamaBar } from "./OllamaBar";
 import { DEFAULT_SETTINGS } from "@/lib/indicator-engine";
-import type { Timeframe, IndicatorSettings, IndicatorStats } from "@/types";
+import type { Timeframe, IndicatorSettings, IndicatorStats, ChartMarker, OHLCVBar } from "@/types";
 
 // ── Horizontal indicator stats bar ──────────────────────────────────────────
 
@@ -79,6 +80,8 @@ export function TradingTerminal() {
   const [isLoading, setIsLoading] = useState(false);
   const [settings, setSettings] = useState<IndicatorSettings>(DEFAULT_SETTINGS);
   const [stats, setStats] = useState<IndicatorStats | null>(null);
+  const [markers, setMarkers] = useState<ChartMarker[]>([]);
+  const [bars, setBars] = useState<OHLCVBar[]>([]);
 
   const handleLoading = useCallback((v: boolean) => setIsLoading(v), []);
   const handleSettings = useCallback((s: IndicatorSettings) => setSettings(s), []);
@@ -128,8 +131,12 @@ export function TradingTerminal() {
           settings={settings}
           onLoadingChange={handleLoading}
           onStatsChange={setStats}
+          onMarkersChange={setMarkers}
+          onBarsChange={setBars}
         />
       </main>
+
+      <OllamaBar symbol={symbol} timeframe={timeframe} stats={stats} markers={markers} bars={bars} />
     </div>
   );
 }

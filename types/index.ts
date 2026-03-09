@@ -82,6 +82,9 @@ export interface IndicatorStats {
   volume: string;
   volumeColor: string;
   volumeRatio: number;
+  lastPrice: number;
+  ema200: number | null;
+  atrStopColor: string | null;
 }
 
 export interface IndicatorOutput {
