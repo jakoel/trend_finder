@@ -36,15 +36,15 @@ function StatsBar({ stats }: { stats: IndicatorStats }) {
 
   return (
     <div className="flex items-center gap-2.5 select-none overflow-hidden">
+      <StatChip label="TREND" value={stats.trend} color={stats.trendColor} />
+      <Dot />
+      <StatChip label="MOM" value={stats.momentum} color={stats.momentumColor} />
+      <Dot />
       <StatChip label="RSI" value={stats.rsi.toFixed(1)} color={rsiColor} />
       <Dot />
       <StatChip label="ADX" value={stats.adx.toFixed(1)} color={adxColor} />
       <Dot />
       <StatChip label="HIST" value={stats.histogram.toFixed(4)} color={histColor} />
-      <Dot />
-      <StatChip label="TREND" value={stats.trend} color={stats.trendColor} />
-      <Dot />
-      <StatChip label="MOM" value={stats.momentum} color={stats.momentumColor} />
       <Dot />
       <StatChip label="VOL" value={`${stats.volume} ${stats.volumeRatio.toFixed(1)}×`} color={stats.volumeColor} />
       <Dot />
@@ -88,9 +88,11 @@ export function TradingTerminal() {
       {/* ── Indicator stats bar ───────────────────────────────────────── */}
       {stats && (
         <div
-          className="flex items-center shrink-0 px-4"
+          className="flex items-center shrink-0"
           style={{
             height: "30px",
+            paddingLeft: "24px",
+            paddingRight: "20px",
             background: "#0c0e14",
             borderBottom: "1px solid #1a1d27",
           }}

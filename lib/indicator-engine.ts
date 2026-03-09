@@ -86,7 +86,7 @@ export function runIndicatorEngine(
 
   // ── Markers ────────────────────────────────────────────────────────────────
   const MARKER_SIZE = 0.24;
-  const RSI_MARKER_SIZE = MARKER_SIZE / 2; // 0.12 — squares render visually larger
+  const RSI_MARKER_SIZE = MARKER_SIZE / 4; // 0.06
   const markers: ChartMarker[] = [];
 
   for (let i = 0; i < n; i++) {
