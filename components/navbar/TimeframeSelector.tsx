@@ -61,9 +61,9 @@ export function TimeframeSelector({ selected, onChange }: Props) {
         ref={triggerRef}
         onClick={() => setOpen((o) => !o)}
         onKeyDown={handleKeyDown}
-        className="flex items-center gap-1 px-2.5 py-1 rounded-md cursor-pointer transition-colors outline-none focus-visible:ring-1 focus-visible:ring-[#2962ff]"
+        className="flex items-center gap-1.5 px-4 py-2 rounded-md cursor-pointer transition-colors outline-none focus-visible:ring-1 focus-visible:ring-[#2962ff]"
         style={{
-          fontSize: "12px",
+          fontSize: "13px",
           fontWeight: 600,
           letterSpacing: "0.02em",
           color: "#6b8cff",

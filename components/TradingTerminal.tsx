@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useCallback } from "react";
+import { useState, useEffect, useCallback } from "react";
 import { TopNav } from "./navbar/TopNav";
 import { TradingChart } from "./chart/TradingChart";
 import { DEFAULT_SETTINGS } from "@/lib/indicator-engine";
@@ -63,15 +63,35 @@ function StatsBar({ stats }: { stats: IndicatorStats }) {
 
 // ── Terminal ─────────────────────────────────────────────────────────────────
 
+const LS_SYMBOL = "tf_last_symbol";
+const LS_TIMEFRAME = "tf_last_timeframe";
+
 export function TradingTerminal() {
-  const [symbol, setSymbol] = useState("AAPL");
+  const [symbol, setSymbol] = useState<string>("AAPL");
   const [timeframe, setTimeframe] = useState<Timeframe>("1D");
+
+  useEffect(() => {
+    const s = localStorage.getItem(LS_SYMBOL);
+    const tf = localStorage.getItem(LS_TIMEFRAME);
+    if (s) setSymbol(s);
+    if (tf) setTimeframe(tf as Timeframe);
+  }, []);
   const [isLoading, setIsLoading] = useState(false);
   const [settings, setSettings] = useState<IndicatorSettings>(DEFAULT_SETTINGS);
   const [stats, setStats] = useState<IndicatorStats | null>(null);
 
   const handleLoading = useCallback((v: boolean) => setIsLoading(v), []);
   const handleSettings = useCallback((s: IndicatorSettings) => setSettings(s), []);
+
+  const handleSymbolChange = useCallback((s: string) => {
+    setSymbol(s);
+    localStorage.setItem(LS_SYMBOL, s);
+  }, []);
+
+  const handleTimeframeChange = useCallback((tf: Timeframe) => {
+    setTimeframe(tf);
+    localStorage.setItem(LS_TIMEFRAME, tf);
+  }, []);
 
   return (
     <div className="flex flex-col h-screen overflow-hidden" style={{ background: "#131722" }}>
@@ -80,8 +100,8 @@ export function TradingTerminal() {
         timeframe={timeframe}
         isLoading={isLoading}
         settings={settings}
-        onSymbolChange={setSymbol}
-        onTimeframeChange={setTimeframe}
+        onSymbolChange={handleSymbolChange}
+        onTimeframeChange={handleTimeframeChange}
         onSettingsChange={handleSettings}
       />
 

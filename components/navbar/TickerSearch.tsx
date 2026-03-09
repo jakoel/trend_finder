@@ -68,13 +68,13 @@ export function TickerSearch({ symbol, onSelect }: Props) {
     <div className="relative">
       <button
         onClick={() => setOpen((o) => !o)}
-        className="group flex items-center gap-1.5 px-2.5 py-1 rounded cursor-pointer hover:bg-[#1e222d] transition-colors"
+        className="group flex items-center gap-2 px-4 py-2 rounded cursor-pointer hover:bg-[#1e222d] transition-colors"
       >
-        <span className="text-[15px] font-bold text-white tracking-tight leading-none">
+        <span className="text-[16px] font-bold text-white tracking-tight leading-none">
           {symbol}
         </span>
         <ChevronDown
-          className="w-3.5 h-3.5 text-[#787b86] group-hover:text-white transition-colors mt-px"
+          className="w-4 h-4 text-[#787b86] group-hover:text-white transition-colors mt-px"
           strokeWidth={2.5}
         />
       </button>
