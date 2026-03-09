@@ -1,16 +1,21 @@
 {
-  "name": "trend_finder",
+  "name": "trend-finder",
   "version": "0.1.0",
   "private": true,
   "scripts": {
-    "dev": "next dev",
+    "dev": "next dev --turbopack",
     "build": "next build",
     "start": "next start"
   },
   "dependencies": {
-    "next": "16.1.6",
-    "react": "19.2.3",
-    "react-dom": "19.2.3"
+    "clsx": "^2.1.1",
+    "dexie": "^4.0.10",
+    "lightweight-charts": "^5.0.7",
+    "lucide-react": "^0.475.0",
+    "next": "^15.5.12",
+    "react": "^19.0.0",
+    "react-dom": "^19.0.0",
+    "tailwind-merge": "^3.0.2"
   },
   "devDependencies": {
     "@tailwindcss/postcss": "^4",

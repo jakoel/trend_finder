@@ -24,6 +24,13 @@
 .DS_Store
 *.pem
 
+# claude code internals
+.claude/
+
+# internal dev notes
+GAP_ANALYSIS.md
+indicatorSuite.pine
+
 # debug
 npm-debug.log*
 yarn-debug.log*
