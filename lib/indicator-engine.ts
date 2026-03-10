@@ -121,13 +121,14 @@ export function runIndicatorEngine(
       if (rsiBearDiv[i] || macdBearDiv[i]) markers.push({ time: t, position: "aboveBar", shape: "arrowDown", color: "#ef5350", text: "", size: MARKER_SIZE, category: "divergence" });
     }
 
-    // Momentum fading markers
+    // Momentum fading markers — RSI slope must confirm direction
     if (settings.showMomentum && !isNaN(h)) {
       const prevH = i >= P.accelLookback ? hist[i - P.accelLookback] : NaN;
-      if (histDecel[i] && h > 0 && !isNaN(prevH) && prevH > 0) {
+      const rsiSlope = i >= 3 ? rsiArr[i] - rsiArr[i - 3] : NaN;
+      if (histDecel[i] && h > 0 && !isNaN(prevH) && prevH > 0 && !isNaN(rsiSlope) && rsiSlope < 0) {
         markers.push({ time: t, position: "belowBar", shape: "arrowUp", color: "#FF9800", text: "", size: MARKER_SIZE, category: "momentum" });
       }
-      if (histDecel[i] && h < 0 && !isNaN(prevH) && prevH < 0) {
+      if (histDecel[i] && h < 0 && !isNaN(prevH) && prevH < 0 && !isNaN(rsiSlope) && rsiSlope > 0) {
         markers.push({ time: t, position: "aboveBar", shape: "arrowDown", color: "#FF9800", text: "", size: MARKER_SIZE, category: "momentum" });
       }
     }

@@ -10,7 +10,7 @@ export const P = {
   adxLen: 14,
   adxThreshold: 20,
   divLookback: 14,
-  accelLookback: 5,
+  accelLookback: 8,
   volMALen: 20,
   volSurge: 1.5,
   atrLen: 10,

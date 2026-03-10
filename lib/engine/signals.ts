@@ -83,18 +83,27 @@ export function computeSignals(input: SignalsInput): SignalsOutput {
   }
 
   // ── Momentum acceleration / deceleration ──────────────────────────────────
+  // Uses first-vs-last comparison over accelLookback bars (10% threshold)
+  // gated by a minimum size filter (must be >20% of recent 20-bar histogram range).
   const histAccel: boolean[] = new Array(n).fill(false);
   const histDecel: boolean[] = new Array(n).fill(false);
   for (let i = P.accelLookback; i < n; i++) {
-    if (isNaN(hist[i])) continue;
-    let accel = true;
-    let decel = true;
-    for (let k = 1; k < P.accelLookback; k++) {
-      if (Math.abs(hist[i - k + 1]) <= Math.abs(hist[i - k])) accel = false;
-      if (Math.abs(hist[i - k + 1]) >= Math.abs(hist[i - k])) decel = false;
+    const cur = hist[i];
+    const prev = hist[i - P.accelLookback];
+    if (isNaN(cur) || isNaN(prev)) continue;
+
+    const curAbs = Math.abs(cur);
+    const prevAbs = Math.abs(prev);
+
+    // Size gate: ignore signals when histogram is near the zero-line
+    let recentMax = 0;
+    for (let k = Math.max(0, i - 19); k <= i; k++) {
+      if (!isNaN(hist[k])) recentMax = Math.max(recentMax, Math.abs(hist[k]));
     }
-    histAccel[i] = accel;
-    histDecel[i] = decel;
+    const meaningful = recentMax > 0 && curAbs > recentMax * 0.3;
+
+    histAccel[i] = meaningful && curAbs > prevAbs * 1.2;
+    histDecel[i] = meaningful && curAbs < prevAbs * 0.8;
   }
 
   // ── Confluence scoring ────────────────────────────────────────────────────
