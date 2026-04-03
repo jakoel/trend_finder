@@ -141,12 +141,31 @@ export async function fetchOHLCVBefore(
     .filter((b) => b.open > 0 && b.close > 0);
 }
 
-export function searchTickers(query: string): Ticker[] {
-  const q = query.toLowerCase();
-  return POPULAR_TICKERS.filter(
-    (t) =>
-      t.symbol.toLowerCase().includes(q) || t.label.toLowerCase().includes(q)
-  );
+interface YahooSearchQuote {
+  symbol: string;
+  shortname?: string;
+  longname?: string;
+  exchange?: string;
+  exchDisp?: string;
+  quoteType?: string;
+}
+
+export async function searchTickers(query: string): Promise<Ticker[]> {
+  if (!query.trim()) return POPULAR_TICKERS;
+
+  const res = await fetch(`/api/search?q=${encodeURIComponent(query)}`);
+  if (!res.ok) return [];
+
+  const data = await res.json();
+  const quotes: YahooSearchQuote[] = data.quotes ?? [];
+
+  return quotes
+    .filter((q) => q.quoteType === "EQUITY" || q.quoteType === "ETF")
+    .map((q) => ({
+      symbol: q.symbol,
+      label: q.shortname ?? q.longname ?? q.symbol,
+      exchange: q.exchDisp ?? q.exchange ?? "",
+    }));
 }
 
 export const POPULAR_TICKERS: Ticker[] = [

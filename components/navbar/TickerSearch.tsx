@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useRef, useEffect, useCallback } from "react";
-import { Search, ChevronDown, X } from "lucide-react";
+import { Search, ChevronDown, X, Loader2 } from "lucide-react";
 import { searchTickers, POPULAR_TICKERS } from "@/lib/api";
 import type { Ticker } from "@/types";
 
@@ -13,11 +13,12 @@ interface Props {
 export function TickerSearch({ symbol, onSelect }: Props) {
   const [open, setOpen] = useState(false);
   const [query, setQuery] = useState("");
+  const [results, setResults] = useState<Ticker[]>(POPULAR_TICKERS);
+  const [loading, setLoading] = useState(false);
   const [focusedIndex, setFocusedIndex] = useState(-1);
   const inputRef = useRef<HTMLInputElement>(null);
   const listRef = useRef<HTMLUListElement>(null);
-
-  const results = query.trim() ? searchTickers(query) : POPULAR_TICKERS;
+  const debounceRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   useEffect(() => {
     if (open) {
@@ -26,12 +27,31 @@ export function TickerSearch({ symbol, onSelect }: Props) {
     }
   }, [open]);
 
-  // Reset focused index when results change
   useEffect(() => {
     setFocusedIndex(-1);
+  }, [results]);
+
+  useEffect(() => {
+    if (debounceRef.current) clearTimeout(debounceRef.current);
+
+    if (!query.trim()) {
+      setResults(POPULAR_TICKERS);
+      setLoading(false);
+      return;
+    }
+
+    setLoading(true);
+    debounceRef.current = setTimeout(async () => {
+      const found = await searchTickers(query);
+      setResults(found);
+      setLoading(false);
+    }, 300);
+
+    return () => {
+      if (debounceRef.current) clearTimeout(debounceRef.current);
+    };
   }, [query]);
 
-  // Scroll focused item into view
   useEffect(() => {
     if (focusedIndex < 0 || !listRef.current) return;
     const item = listRef.current.children[focusedIndex] as HTMLElement | undefined;
@@ -98,7 +118,11 @@ export function TickerSearch({ symbol, onSelect }: Props) {
               className="flex items-center gap-2.5 px-4 py-3"
               style={{ borderBottom: "1px solid #2a2e39" }}
             >
-              <Search className="w-3.5 h-3.5 shrink-0" style={{ color: "#787b86" }} />
+              {loading ? (
+                <Loader2 className="w-3.5 h-3.5 shrink-0 animate-spin" style={{ color: "#787b86" }} />
+              ) : (
+                <Search className="w-3.5 h-3.5 shrink-0" style={{ color: "#787b86" }} />
+              )}
               <input
                 ref={inputRef}
                 value={query}
@@ -108,10 +132,7 @@ export function TickerSearch({ symbol, onSelect }: Props) {
                 className="flex-1 bg-transparent text-sm text-white outline-none placeholder:text-[#4c525e]"
               />
               {query && (
-                <button
-                  onClick={() => setQuery("")}
-                  className="cursor-pointer"
-                >
+                <button onClick={() => setQuery("")} className="cursor-pointer">
                   <X className="w-3.5 h-3.5 hover:text-white transition-colors" style={{ color: "#787b86" }} />
                 </button>
               )}
@@ -119,7 +140,7 @@ export function TickerSearch({ symbol, onSelect }: Props) {
 
             {/* Results */}
             <ul ref={listRef} className="max-h-72 overflow-y-auto py-1.5">
-              {results.length === 0 ? (
+              {results.length === 0 && !loading ? (
                 <li className="px-4 py-3.5 text-sm" style={{ color: "#787b86" }}>
                   No results for &quot;{query}&quot;
                 </li>
